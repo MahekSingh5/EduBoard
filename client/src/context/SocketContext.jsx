@@ -11,8 +11,13 @@ export const SocketProvider = ({ children, token, userId, username, role }) => {
   useEffect(() => {
     if (!token || !userId) return;
 
-    // Connect to server on port 5001 by default
-    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
+    const apiUrl = import.meta.env.VITE_API_URL;
+    const inferredSocketUrl = apiUrl ? apiUrl.replace(/\/api\/?$/, '') : null;
+    const socketUrl =
+      import.meta.env.VITE_SOCKET_URL ||
+      inferredSocketUrl ||
+      (import.meta.env.DEV ? 'http://localhost:5000' : window.location.origin);
+
     const newSocket = io(socketUrl, {
       auth: {
         token,

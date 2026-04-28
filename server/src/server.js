@@ -9,11 +9,12 @@ import setupSocketHandlers from './sockets/index.js';
 
 // Create HTTP server
 const server = http.createServer(app);
+const allowedOrigins = env.CORS_ORIGINS || [env.CORS_ORIGIN];
 
 // Initialize Socket.IO
 const io = new SocketIOServer(server, {
   cors: {
-    origin: env.CORS_ORIGIN,
+    origin: allowedOrigins,
     methods: ['GET', 'POST'],
   },
   transports: ['websocket', 'polling'],
@@ -32,8 +33,8 @@ const startServer = async () => {
     server.listen(env.PORT, () => {
       console.log(`\n✓ Server running on port ${env.PORT}`);
       console.log(`✓ Environment: ${env.NODE_ENV}`);
-      console.log(`✓ MongoDB: ${env.MONGO_URI}`);
-      console.log(`✓ CORS Origin: ${env.CORS_ORIGIN}\n`);
+      console.log(`✓ MongoDB: ${env.MONGODB_URI}`);
+      console.log(`✓ CORS Origins: ${allowedOrigins.join(', ')}\n`);
     });
   } catch (error) {
     console.error('Failed to start server:', error.message);

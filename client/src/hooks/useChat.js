@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import apiClient from '../services/apiClient';
 import { useSocket } from './useSocket';
 import { SOCKET_EVENTS } from '../utils/socketEvents';
 
@@ -14,10 +14,7 @@ export const useChat = (roomId, token) => {
     const fetchMessages = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(
-          `/api/rooms/${roomId}/chat/messages`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const response = await apiClient.get(`/rooms/${roomId}/chat/messages`);
         setMessages(response.data.messages);
       } catch (error) {
         console.error('Failed to fetch messages:', error);

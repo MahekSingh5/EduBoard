@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import apiClient from '../services/apiClient';
 import { useSocket } from './useSocket';
 import { SOCKET_EVENTS } from '../utils/socketEvents';
 
@@ -15,9 +15,7 @@ export const useQuiz = (roomId, token) => {
     const fetchQuizzes = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`/api/rooms/${roomId}/quiz`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await apiClient.get(`/rooms/${roomId}/quiz`);
         setQuizzes(response.data.quizzes);
       } catch (error) {
         console.error('Failed to fetch quizzes:', error);
@@ -61,9 +59,7 @@ export const useQuiz = (roomId, token) => {
 
   const createQuiz = useCallback(async (quizData) => {
     try {
-      const response = await axios.post(`/api/rooms/${roomId}/quiz`, quizData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await apiClient.post(`/rooms/${roomId}/quiz`, quizData);
       setQuizzes([...quizzes, response.data.quiz]);
       return response.data.quiz;
     } catch (error) {

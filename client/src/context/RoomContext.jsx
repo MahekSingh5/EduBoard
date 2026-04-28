@@ -1,5 +1,5 @@
 import React, { createContext, useState, useCallback } from 'react';
-import axios from 'axios';
+import apiClient from '../services/apiClient';
 
 export const RoomContext = createContext();
 
@@ -13,11 +13,7 @@ export const RoomProvider = ({ children, token }) => {
     async (name, description, maxStudents = 50) => {
       setLoading(true);
       try {
-        const response = await axios.post(
-          '/api/rooms',
-          { name, description, maxStudents },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const response = await apiClient.post('/rooms', { name, description, maxStudents });
         return response.data.room;
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to create room');
@@ -33,11 +29,7 @@ export const RoomProvider = ({ children, token }) => {
     async (roomCode) => {
       setLoading(true);
       try {
-        const response = await axios.post(
-          `/api/rooms/${roomCode}/join`,
-          {},
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const response = await apiClient.post(`/rooms/${roomCode}/join`, {});
         setCurrentRoom(response.data.room);
         return response.data.room;
       } catch (err) {
@@ -54,11 +46,7 @@ export const RoomProvider = ({ children, token }) => {
     async (roomId) => {
       setLoading(true);
       try {
-        await axios.post(
-          `/api/rooms/${roomId}/leave`,
-          {},
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await apiClient.post(`/rooms/${roomId}/leave`, {});
         setCurrentRoom(null);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to leave room');
@@ -73,9 +61,7 @@ export const RoomProvider = ({ children, token }) => {
   const getTeacherRooms = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/rooms/teacher/rooms', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await apiClient.get('/rooms/teacher/rooms');
       setRooms(response.data.rooms);
       return response.data.rooms;
     } catch (err) {

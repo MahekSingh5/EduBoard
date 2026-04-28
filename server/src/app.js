@@ -13,9 +13,18 @@ import boardRoutes from './routes/boardRoutes.js';
 import { errorMiddleware } from './middleware/errorMiddleware.js';
 
 const app = express();
+const allowedOrigins = new Set(env.CORS_ORIGINS || [env.CORS_ORIGIN]);
 
 // Middleware
-app.use(cors({ origin: env.CORS_ORIGIN }));
+app.use(cors({
+  origin(origin, callback) {
+    // Allow non-browser tools like curl/postman
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.has(origin)) return callback(null, true);
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
